@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
 :root{
   --bg:#07070a; --bg-alt:#0d0a0d; --panel:#0f0c10;
@@ -16,7 +17,7 @@
   box-sizing:border-box;
 }
 
-/* GLOBAL TEXT GLOW STRIP - Absolute zero text glow */
+/* GLOBAL TEXT GLOW STRIP */
 *, *::before, *::after {
   text-shadow: none !important;
   box-shadow: none;
@@ -34,7 +35,7 @@ body{
 a{color:inherit; text-decoration:none;}
 ::selection{background:var(--ether); color:#0a0a0a;}
 
-/* ---- ether canvas ---- */
+/* ---- ether background canvas ---- */
 #ether{position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.20;}
 
 /* ---- nav ---- */
@@ -71,7 +72,7 @@ nav a:hover{color:var(--ether-soft);}
 
 .hero .eyebrow{color:var(--ether-soft); font-size:20px; margin-bottom:18px; max-width:520px; line-height:1.5;}
 .hero h1{
-  font-size:clamp(2.5rem,6vw,5.5rem); line-height:.95; text-transform:uppercase; color:#ffffff;
+  font-size:clamp(2.5rem,5.5vw,5.5rem); line-height:.95; text-transform:uppercase; color:#ffffff;
 }
 .hero h1 em{font-style:normal; color:var(--ether);}
 .hero .role{margin-top:26px; font-size:clamp(1rem,1.5vw,1.2rem); color:var(--text-dim); max-width:600px; line-height:1.6;}
@@ -87,27 +88,29 @@ nav a:hover{color:var(--ether-soft);}
 .scroll-cue{position:absolute; bottom:38px; left:6vw; font-size:.85rem; color:var(--text-dim); display:flex; align-items:center; gap:10px;}
 .scroll-cue i{width:1px; height:34px; background:linear-gradient(var(--ether),transparent); display:block;}
 
-/* ---- ANIMATED HERO IMAGE (UPDATED SIZE) ---- */
+/* ---- LARGE RECTANGULAR HERO PROFILE CANVAS WRAPPER WITH GLOW ---- */
 .hero-image-wrapper {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   position: relative;
   width: 100%;
-  max-width: 850px;
+  max-width: 650px; /* Generous prominent rectangular display */
   justify-self: center;
+  margin: 0 auto;
 }
 
-/* Background Animated Red Glow Circle */
+/* Background Ambient Animated Red Ether Radial Glow */
 .hero-image-wrapper::before {
   content: '';
   position: absolute;
-  width: 85%;
-  height: 85%;
-  background: radial-gradient(circle, rgba(255, 43, 57, 0.25) 0%, rgba(7, 7, 10, 0) 70%);
-  border-radius: 50%;
+  inset: -15px;
+  background: radial-gradient(circle, rgba(255, 43, 57, 0.35) 0%, rgba(255, 43, 57, 0.1) 45%, rgba(7, 7, 10, 0) 75%);
+  border-radius: 12px;
   z-index: 1;
-  animation: glowPulse 4s ease-in-out infinite alternate;
+  animation: glowPulse 3.5s ease-in-out infinite alternate;
+  pointer-events: none;
 }
 
 .hero-img-container {
@@ -117,33 +120,44 @@ nav a:hover{color:var(--ether-soft);}
   display: flex;
   justify-content: center;
   align-items: center;
-  animation: floatImage 6s ease-in-out infinite;
+  cursor: pointer;
+  user-select: none;
+  perspective: 1000px;
 }
 
-.hero-img-container img {
+#profileCanvas {
+  display: block;
   width: 100%;
-  max-width:850px;
   height: auto;
+  max-height: 520px;
   object-fit: contain;
-  filter: drop-shadow(0 0 10px rgba(255, 43, 57, 0.5)); /* Base red glow */
-  transition: transform 0.3s ease, filter 0.3s ease;
+  border-radius: 4px;
+  filter: drop-shadow(0 0 20px rgba(255, 43, 57, 0.5));
+  transition: filter 0.3s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.hero-img-container:hover img {
-  transform: scale(1.04) translateY(-5px);
-  filter: drop-shadow(0 0 20px rgba(255, 43, 57, 0.8)); /* Enhanced red glow on hover */
+.hero-img-container:hover #profileCanvas {
+  filter: drop-shadow(0 0 35px rgba(255, 43, 57, 0.95));
 }
 
-/* Keyframe Animations */
-@keyframes floatImage {
-  0% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-18px) rotate(1.5deg); }
-  100% { transform: translateY(0px) rotate(0deg); }
+.click-hint {
+  margin-top: 14px;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  pointer-events: none;
+  opacity: 0.8;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+.hero-img-container:hover + .click-hint {
+  opacity: 1;
+  color: var(--ether-soft);
 }
 
 @keyframes glowPulse {
-  0% { transform: scale(0.85); opacity: 0.3; }
-  100% { transform: scale(1.15); opacity: 0.7; }
+  0% { transform: scale(0.92); opacity: 0.4; }
+  100% { transform: scale(1.08); opacity: 0.85; }
 }
 
 /* ---- sections ---- */
@@ -166,10 +180,10 @@ section{position:relative; z-index:2; padding:120px 6vw;}
 .skill-cloud span{
   padding:14px 24px; background:var(--panel); border:1px solid var(--line); border-radius:4px;
   font-size:1.15rem; font-weight:500; color:var(--text-dim);
-  transition: transform 0.1s cubic-bezier(0.16, 1, 0.3, 1),
-              color 0.1s cubic-bezier(0.16, 1, 0.3, 1),
-              border-color 0.1s cubic-bezier(0.16, 1, 0.3, 1),
-              background-color 0.1s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.15s cubic-bezier(0.16, 1, 0.3, 1),
+              background-color 0.15s cubic-bezier(0.16, 1, 0.3, 1);
   cursor:default;
   will-change: transform, color, border-color, background-color;
 }
@@ -178,7 +192,7 @@ section{position:relative; z-index:2; padding:120px 6vw;}
   border-color:var(--ether) !important; 
   color:#ffffff !important; 
   background:rgba(255,43,57,.12) !important;
-  transform:translateY(-3px) scale(1.03);
+  transform:translateY(-4px) scale(1.03);
 }
 
 /* projects */
@@ -258,13 +272,13 @@ section{position:relative; z-index:2; padding:120px 6vw;}
 .contact .links{display:flex; gap:34px; margin-top:40px; flex-wrap:wrap;}
 .contact .links a{font-size:1rem; border-bottom:1px solid var(--line); padding-bottom:4px; color:#ffffff;}
 .contact .links a:hover{color:var(--ether-soft); border-color:var(--ether);}
-footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-size:.9rem; display:flex; justify-between:space-between; border-top:1px solid var(--line); position:relative; z-index:2;}
+footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-size:.9rem; display:flex; justify-content:space-between; border-top:1px solid var(--line); position:relative; z-index:2;}
 
 @media(max-width:920px){
   .hero{grid-template-columns:1fr; text-align:center; padding-top:130px; gap:50px;}
   .hero .hero-text-content{align-items:center;}
   .hero .cta-row{justify-content:center;}
-  .hero-image-wrapper{order: -1; max-width:400px;}
+  .hero-image-wrapper{order: -1; max-width:550px;}
 }
 @media(max-width:820px){
   nav ul{display:none;}
@@ -274,6 +288,7 @@ footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-
 }
 @media(max-width:480px){
   .cert-grid{grid-template-columns:1fr;}
+  .hero-image-wrapper{max-width: 100%;}
 }
 @media (prefers-reduced-motion: reduce){
   *{transition:none !important; animation:none !important;}
@@ -312,12 +327,12 @@ footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-
     </div>
   </div>
 
-  <!-- ANIMATED IMAGE CONTAINER -->
+  <!-- RECTANGULAR PROMINENT HERO IMAGE CANVAS WITH AMBIENT GLOW & SCATTER/DISTORTION EFFECT -->
   <div class="hero-image-wrapper">
-    <div class="hero-img-container">
-      <!-- REPLACE "profile.png" WITH YOUR IMAGE PATH -->
-      <img src="profile.png" alt="Harshit Data Analyst Illustration">
+    <div class="hero-img-container" id="profileContainer" title="Hover to distort/scatter, Click to re-assemble!">
+      <canvas id="profileCanvas"></canvas>
     </div>
+    <span class="click-hint">✦ Welcome To My Portfolio ✦</span>
   </div>
 
   <div class="scroll-cue"><i></i>Scroll</div>
@@ -359,8 +374,8 @@ footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-
       <p>Built a machine learning model to predict telecom customer churn using Python and Random Forest. Performed EDA, data preprocessing, categorical encoding, feature scaling, and handled class imbalance . Compared multiple approaches and developed a trained model with a prediction interface to identify customers at higher risk of churn.</p>
       <div class="stack"><span>Python</span><span>Scikit-Learn</span><span>Jupyter Notebook</span><span>Streamlit</span></div>
       <div class="card-links">
-        <a href="https://github.com/HRTvictor/Telecom_Churn_Prediction_Model" data-editable="github-link-1">GitHub ↗</a>
-        <a href="#" data-editable="demo-link-1">Live Demo ↗</a>
+        <a href="https://github.com/HRTvictor/Telecom_Churn_Prediction_Model" target="_blank">GitHub ↗</a>
+        <a href="#">Live Demo ↗</a>
       </div>
     </div>
 
@@ -370,7 +385,7 @@ footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-
       <p>Built a PAN Number Validation system using Python and MySQL to clean and validate unstructured PAN data. Implemented data preprocessing, duplicate and null handling, REGEXP-based format validation, custom SQL functions, CTEs, and business rules to categorize PAN records as valid or invalid and generate a validation summary.</p>
       <div class="stack"><span>MySQL</span><span>Python</span><span>Load and Transform</span></div>
       <div class="card-links">
-        <a href="https://github.com/HRTvictor/Pan-Number-Validation-Using-SQL" data-editable="github-link-2">GitHub ↗</a>
+        <a href="https://github.com/HRTvictor/Pan-Number-Validation-Using-SQL" target="_blank">GitHub ↗</a>
       </div>
     </div>
 
@@ -380,8 +395,8 @@ footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-
       <p>Analyzed 3,900 customer transactions using Python, SQL, and Power BI to uncover customer spending patterns, product preferences, subscription behavior, and revenue trends. Performed data cleaning and feature engineering in Python, conducted business analysis with MySQL, and built an interactive Power BI dashboard to turn raw data into actionable business insights.</p>
       <div class="stack"><span>Power BI</span><span>Python</span><span>Jupyter Notebook</span></div>
       <div class="card-links">
-        <a href="https://github.com/HRTvictor/Customer_Shopping_Behavior_Analysis-Python-SQL-PowerBI" data-editable="github-link-3">GitHub ↗</a>
-        <a href="#" data-editable="demo-link-3">Dashboard ↗</a>
+        <a href="https://github.com/HRTvictor/Customer_Shopping_Behavior_Analysis-Python-SQL-PowerBI" target="_blank">GitHub ↗</a>
+        <a href="#">Dashboard ↗</a>
       </div>
     </div>
 
@@ -391,18 +406,18 @@ footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-
       <p>Completed Deloitte's virtual data analytics job simulation, working through a realistic client analytics brief end-to-end.</p>
       <div class="stack"><span>Data Analysis</span><span>Business Case</span></div>
       <div class="card-links">
-        <a href="#" data-editable="cert-link-4">Certificate ↗</a>
+        <a href="#">Certificate ↗</a>
       </div>
     </div>
 
     <div class="card reveal">
-      <span class="tag">Web-Devlopment</span>
-      <h3>Exif Tool Chrome Extension </h3>
+      <span class="tag">Web-Development</span>
+      <h3>Exif Tool Chrome Extension</h3>
       <p>Developed a browser extension for EXIF metadata management that helps users inspect and remove photo metadata before sharing images online. Built with HTML, CSS, and JavaScript, the project includes metadata viewing, removal, recording, and client-side storage features, with a focus on image privacy and secure social media sharing.</p>
       <div class="stack"><span>HTML</span><span>CSS</span><span>Javascript</span></div>
       <div class="card-links">
-        <a href="https://github.com/HRTvictor/EXIF_TOOL_extension">GitHub ↗</a>
-        <a href="#" data-editable="demo-link-3">View ↗</a>
+        <a href="https://github.com/HRTvictor/EXIF_TOOL_extension" target="_blank">GitHub ↗</a>
+        <a href="#">View ↗</a>
       </div>
     </div>
 
@@ -413,22 +428,22 @@ footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-
   <div class="section-head reveal"><span class="num">04</span><h2 class="display">Certificates</h2></div>
   <div class="cert-grid" id="certGrid">
     <div class="cert reveal">
-      <div style="display:inline-block;"><img src="cisco.png" alt="cisco-logo" style="height:30px; width:auto; vertical-align:middle;"></div>
+      <div style="display:inline-block;"><img src="https://placehold.co/120x35/0f0c10/ff2b39?text=CISCO" alt="cisco-logo" style="height:30px; width:auto; vertical-align:middle;"></div>
       <h4>Cisco Networking Academy Data Analytics Essentials</h4>
       <p>Cisco Networking Academy</p>
-      <a href="https://www.credly.com/badges/9232002d-f076-4fc9-8c97-7ba92b95075c/public_url" data-editable="cert-view-1">View Certificate ↗</a>
+      <a href="https://www.credly.com/badges/9232002d-f076-4fc9-8c97-7ba92b95075c/public_url" target="_blank">View Certificate ↗</a>
     </div>
     <div class="cert reveal">
-      <div style="display:inline-block;"><img src="ibm.png" alt="ibm-logo" style="height:30px; width:auto; vertical-align:middle;"></div>
+      <div style="display:inline-block;"><img src="https://placehold.co/120x35/0f0c10/ff2b39?text=IBM" alt="ibm-logo" style="height:30px; width:auto; vertical-align:middle;"></div>
       <h4>Data Analytics for Machine Learning</h4>
       <p>IBM</p>
-      <a href="https://www.credly.com/badges/0f158fd6-f9fc-40a4-a7c5-2f2b0c3abb17/public_url" data-editable="cert-view-1">View Certificate ↗</a>
+      <a href="https://www.credly.com/badges/0f158fd6-f9fc-40a4-a7c5-2f2b0c3abb17/public_url" target="_blank">View Certificate ↗</a>
     </div>
     <div class="cert reveal">
-      <div style="display:inline-block;"><img src="deloitte.png" alt="deloitte-logo" style="height:30px; width:auto; vertical-align:middle;"></div>
+      <div style="display:inline-block;"><img src="https://placehold.co/120x35/0f0c10/ff2b39?text=DELOITTE" alt="deloitte-logo" style="height:30px; width:auto; vertical-align:middle;"></div>
       <h4>Deloitte Data Analytics Job Simulation</h4>
       <p>Forage . Virtual job Simulation</p>
-      <a href="#" data-editable="cert-view-2">View Certificate ↗</a>
+      <a href="#">View Certificate ↗</a>
     </div>
     <div class="cert add reveal" id="openCertModal">
       <span>+</span>
@@ -465,10 +480,10 @@ footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-
   <div class="section-head reveal"><span class="num">05</span><h2 class="display" style="border:none;padding:0;margin:0;">Let's Build<br>Something</h2></div>
   <p style="color:var(--text-dim); max-width:52ch; line-height:1.8;">Open to data analyst and data science internships and roles. Reach out — I reply fast.</p>
   <div class="links">
-    <a class="reveal" href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox?compose=GTvVlcSHxwVtZfbbKrgvhrRvzCNcQSWbBWTlbmmCwlCmmtDXhkGrCgwPqbmjpdzkHXsvlsCcfxHxD" data-editable="email-link">Email ↗</a>
-    <a class="reveal" href="https://www.linkedin.com/in/harshit-raj-7480hrt/" data-editable="linkedin-link">LinkedIn ↗</a>
-    <a class="reveal" href="https://github.com/HRTvictor?tab=repositories" data-editable="github-link-main">GitHub ↗</a>
-    <a class="reveal" href="#" data-editable="resume-link">Resume ↗</a>
+    <a class="reveal" href="mailto:harshit.data.analytics@gmail.com">Email ↗</a>
+    <a class="reveal" href="https://www.linkedin.com/in/harshit-raj-7480hrt/" target="_blank">LinkedIn ↗</a>
+    <a class="reveal" href="https://github.com/HRTvictor?tab=repositories" target="_blank">GitHub ↗</a>
+    <a class="reveal" href="#">Resume ↗</a>
   </div>
 </section>
 
@@ -478,7 +493,7 @@ footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-
 </footer>
 
 <script>
-// ---- Ether particle field ----
+// ---- Ether background particle field ----
 const canvas = document.getElementById('ether');
 const ctx = canvas.getContext('2d');
 let w,h,particles=[];
@@ -495,7 +510,7 @@ for(let i=0;i<COUNT;i++){
   });
 }
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-function draw(){
+function drawBackground(){
   ctx.clearRect(0,0,w,h);
   ctx.fillStyle = '#07070a';
   ctx.fillRect(0,0,w,h);
@@ -508,11 +523,11 @@ function draw(){
     ctx.fillStyle=g;
     ctx.beginPath(); ctx.arc(p.x,p.y,p.r*8,0,Math.PI*2); ctx.fill();
   }
-  requestAnimationFrame(draw);
+  requestAnimationFrame(drawBackground);
 }
-draw();
+drawBackground();
 
-// ---- scroll reveal with transitionDelay clearing ----
+// ---- Scroll reveal logic ----
 document.querySelectorAll('.project-grid, .cert-grid, .stat-list, .skill-cloud, .contact .links').forEach(group=>{
   [...group.children].forEach((el,i)=> el.style.transitionDelay = (i*70)+'ms');
 });
@@ -522,7 +537,6 @@ const io = new IntersectionObserver((entries)=>{
     if(entry.isIntersecting){
       entry.target.classList.add('in');
       
-      // Clear transitionDelay after reveal animation completes so hover effects are instant
       setTimeout(() => {
         entry.target.style.transitionDelay = '0s';
       }, 800);
@@ -535,7 +549,7 @@ const io = new IntersectionObserver((entries)=>{
 }, { threshold:0.18, rootMargin:'0px 0px -60px 0px' });
 document.querySelectorAll('.reveal').forEach(el=> io.observe(el));
 
-// ---- typewriter for stats ----
+// ---- Typewriter effect for statistics ----
 function typeWrite(el){
   const full = el.dataset.type;
   if(reduced){ el.textContent = full; return; }
@@ -551,10 +565,10 @@ function typeWrite(el){
   }, 80);
 }
 
-// ---- hero entrance ----
+// ---- Hero Entrance ----
 window.addEventListener('load', ()=> document.querySelector('.hero').classList.add('in'));
 
-// ---- 3D tilt & pop-out on project cards ----
+// ---- 3D tilt on project cards ----
 if(!reduced){
   document.querySelectorAll('.card').forEach(card=>{
     card.addEventListener('mousemove', e=>{
@@ -587,7 +601,6 @@ saveCertBtn.addEventListener('click', () => {
   const url = document.getElementById('certUrl').value.trim() || '#';
 
   if(!title || !issuer){
-    alert('Please enter a certificate title and issuer.');
     return;
   }
 
@@ -604,12 +617,358 @@ saveCertBtn.addEventListener('click', () => {
 
   certGrid.insertBefore(newCard, openCertModal);
   
-  // Clear inputs and close
   document.getElementById('certTitle').value = '';
   document.getElementById('certIssuer').value = '';
   document.getElementById('certUrl').value = '';
   certModal.classList.remove('active');
 });
+
+// ---- RECTANGULAR ADAPTIVE PROFILE CANVAS WITH HOVER DISTORTION & SCATTERING ----
+(function initScatteredProfileSystem() {
+  const pCanvas = document.getElementById('profileCanvas');
+  const pContainer = document.getElementById('profileContainer');
+  if (!pCanvas || !pContainer) return;
+
+  const pCtx = pCanvas.getContext('2d');
+  
+  // Independent COLS x ROWS grid to maintain rectangular integrity
+  const COLS = 16;
+  const ROWS = 12;
+  
+  let tiles = [];
+  let scatterParticles = [];
+  let animFrameId = null;
+  let progress = 0;
+  let mouse = { x: 0, y: 0, targetX: 0, targetY: 0, isHovered: false };
+  let imgAspectRatio = 4 / 3; // Prominent rectangular aspect ratio
+
+  // High quality procedural background photo artwork (with cityscape/buildings background)
+  function generateFallbackAvatar() {
+    const memCanvas = document.createElement('canvas');
+    memCanvas.width = 800;
+    memCanvas.height = 600; // 4:3 Rectangular Aspect Ratio
+    const mCtx = memCanvas.getContext('2d');
+
+    // Dark moody cityscape background with building silhouettes
+    const bgGrad = mCtx.createLinearGradient(0, 0, 0, 600);
+    bgGrad.addColorStop(0, '#120a16');
+    bgGrad.addColorStop(0.5, '#0a0710');
+    bgGrad.addColorStop(1, '#050407');
+    mCtx.fillStyle = bgGrad;
+    mCtx.fillRect(0, 0, 800, 600);
+
+    // City skyline & building geometry background
+    mCtx.fillStyle = '#100b14';
+    // Building shapes
+    const buildings = [
+      {x: 40, w: 90, h: 320}, {x: 140, w: 70, h: 240}, {x: 220, w: 110, h: 380},
+      {x: 350, w: 80, h: 290}, {x: 450, w: 120, h: 420}, {x: 580, w: 85, h: 310}, {x: 680, w: 90, h: 260}
+    ];
+    buildings.forEach(b => {
+      mCtx.fillRect(b.x, 600 - b.h, b.w, b.h);
+      // Windows
+      mCtx.fillStyle = 'rgba(255, 43, 57, 0.25)';
+      for(let wx = b.x + 10; wx < b.x + b.w - 10; wx += 18){
+        for(let wy = 600 - b.h + 20; wy < 580; wy += 28){
+          if(Math.random() > 0.4) mCtx.fillRect(wx, wy, 8, 14);
+        }
+      }
+      mCtx.fillStyle = '#100b14';
+    });
+
+    // Glowing red horizon atmosphere
+    const horizonGrad = mCtx.createRadialGradient(400, 380, 20, 400, 380, 350);
+    horizonGrad.addColorStop(0, 'rgba(255, 43, 57, 0.35)');
+    horizonGrad.addColorStop(1, 'rgba(255, 43, 57, 0)');
+    mCtx.fillStyle = horizonGrad;
+    mCtx.fillRect(0, 0, 800, 600);
+
+    // Tech Grid Floor
+    mCtx.strokeStyle = 'rgba(255, 43, 57, 0.2)';
+    mCtx.lineWidth = 1.5;
+    for(let lx = 0; lx <= 800; lx += 40){
+      mCtx.beginPath();
+      mCtx.moveTo(lx, 420);
+      mCtx.lineTo((lx - 400) * 2.5 + 400, 600);
+      mCtx.stroke();
+    }
+
+    // Outer framing border line
+    mCtx.strokeStyle = 'rgba(255, 43, 57, 0.6)';
+    mCtx.lineWidth = 6;
+    mCtx.strokeRect(12, 12, 776, 576);
+
+    // Stylized Silhouette / Avatar Graphic
+    // Shoulders
+    mCtx.fillStyle = '#1a131f';
+    mCtx.beginPath();
+    mCtx.ellipse(400, 580, 210, 160, 0, 0, Math.PI * 2);
+    mCtx.fill();
+    mCtx.strokeStyle = '#ff2b39';
+    mCtx.lineWidth = 3;
+    mCtx.stroke();
+
+    // Head
+    mCtx.fillStyle = '#ede7e2';
+    mCtx.beginPath();
+    mCtx.arc(400, 280, 90, 0, Math.PI * 2);
+    mCtx.fill();
+
+    // High Tech Cyber Goggles / HUD
+    mCtx.fillStyle = '#ff2b39';
+    mCtx.fillRect(320, 260, 160, 32);
+    mCtx.fillStyle = '#07070a';
+    mCtx.font = '20px Anton, sans-serif';
+    mCtx.fillText('DATA // ANALYTICS', 330, 283);
+
+    // Glowing badge text
+    mCtx.fillStyle = '#ff2b39';
+    mCtx.font = '28px Anton, sans-serif';
+    mCtx.fillText('HARSHIT // PORTFOLIO', 40, 60);
+
+    return memCanvas;
+  }
+
+  let imgSource = new Image();
+  let sourceLoaded = false;
+
+  function onImageReady() {
+    sourceLoaded = true;
+    const w = imgSource.width || imgSource.naturalWidth || 800;
+    const h = imgSource.height || imgSource.naturalHeight || 600;
+    imgAspectRatio = w / h;
+    startAssembleAnimation();
+  }
+
+  imgSource.onload = onImageReady;
+  imgSource.onerror = () => {
+    imgSource = generateFallbackAvatar();
+    onImageReady();
+  };
+
+  imgSource.src = 'profile.png';
+
+  function setupCanvasDimensions() {
+    const rect = pContainer.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+
+    // Preserve generous rectangular dimension
+    const displayW = Math.min(rect.width, 650);
+    const displayH = displayW / imgAspectRatio;
+
+    pCanvas.style.width = displayW + 'px';
+    pCanvas.style.height = displayH + 'px';
+
+    pCanvas.width = displayW * dpr;
+    pCanvas.height = displayH * dpr;
+    pCtx.scale(dpr, dpr);
+
+    return { displayW, displayH };
+  }
+
+  function initTiles() {
+    tiles = [];
+    scatterParticles = [];
+    const displayW = pCanvas.width / (window.devicePixelRatio || 1);
+    const displayH = pCanvas.height / (window.devicePixelRatio || 1);
+
+    const tileW = displayW / COLS;
+    const tileH = displayH / ROWS;
+
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const targetX = c * tileW;
+        const targetY = r * tileH;
+
+        const angle = Math.random() * Math.PI * 2;
+        const spread = Math.max(displayW, displayH) * (0.8 + Math.random() * 1.2);
+        const startX = targetX + Math.cos(angle) * spread;
+        const startY = targetY + Math.sin(angle) * spread;
+        const startRotation = (Math.random() - 0.5) * Math.PI * 4;
+
+        tiles.push({
+          c, r,
+          targetX, targetY,
+          startX, startY,
+          currentX: startX,
+          currentY: startY,
+          hoverOffsetX: 0,
+          hoverOffsetY: 0,
+          hoverRot: 0,
+          startRotation,
+          currentRotation: startRotation,
+          tileW,
+          tileH,
+          delay: (r * 0.02) + (c * 0.015) + Math.random() * 0.2,
+        });
+      }
+    }
+
+    // Initialize red scatter accents
+    for (let i = 0; i < 28; i++) {
+      scatterParticles.push({
+        x: Math.random() * displayW,
+        y: Math.random() * displayH,
+        vx: (Math.random() - 0.5) * 1.5,
+        vy: (Math.random() - 0.5) * 1.5,
+        size: Math.random() * 3.5 + 1.5,
+        alpha: Math.random() * 0.6 + 0.2
+      });
+    }
+  }
+
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function renderFrame() {
+    const displayW = pCanvas.width / (window.devicePixelRatio || 1);
+    const displayH = pCanvas.height / (window.devicePixelRatio || 1);
+    pCtx.clearRect(0, 0, displayW, displayH);
+
+    // Smooth Interpolation for Mouse Tracking
+    mouse.x += (mouse.targetX - mouse.x) * 0.1;
+    mouse.y += (mouse.targetY - mouse.y) * 0.1;
+
+    const mCanvasX = (mouse.x + 0.5) * displayW;
+    const mCanvasY = (mouse.y + 0.5) * displayH;
+
+    tiles.forEach(tile => {
+      let t = Math.max(0, Math.min(1, (progress - tile.delay) / (1 - tile.delay)));
+      const easeT = easeOutCubic(t);
+
+      const baseCurrentX = tile.startX + (tile.targetX - tile.startX) * easeT;
+      const baseCurrentY = tile.startY + (tile.targetY - tile.startY) * easeT;
+
+      // Calculate Hover Distortion and Dispersion Effect
+      let targetHoverX = 0;
+      let targetHoverY = 0;
+      let targetHoverRot = 0;
+
+      if (easeT > 0.9 && mouse.isHovered) {
+        const tileCenterX = tile.targetX + tile.tileW / 2;
+        const tileCenterY = tile.targetY + tile.tileH / 2;
+        
+        const dx = tileCenterX - mCanvasX;
+        const dy = tileCenterY - mCanvasY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const maxDist = 180;
+
+        if (dist < maxDist) {
+          const factor = Math.pow(1 - dist / maxDist, 2);
+          targetHoverX = (dx / (dist || 1)) * factor * 50;
+          targetHoverY = (dy / (dist || 1)) * factor * 50;
+          targetHoverRot = (dx > 0 ? 1 : -1) * factor * 0.45;
+        }
+      }
+
+      // Smooth hover easing
+      tile.hoverOffsetX += (targetHoverX - tile.hoverOffsetX) * 0.12;
+      tile.hoverOffsetY += (targetHoverY - tile.hoverOffsetY) * 0.12;
+      tile.hoverRot += (targetHoverRot - tile.hoverRot) * 0.12;
+
+      tile.currentX = baseCurrentX + tile.hoverOffsetX;
+      tile.currentY = baseCurrentY + tile.hoverOffsetY;
+      tile.currentRotation = (tile.startRotation * (1 - easeT)) + tile.hoverRot;
+
+      pCtx.save();
+
+      // General parallax tilt offset
+      const parallaxX = mouse.x * 12;
+      const parallaxY = mouse.y * 12;
+
+      const drawX = tile.currentX + tile.tileW / 2 + parallaxX;
+      const drawY = tile.currentY + tile.tileH / 2 + parallaxY;
+
+      pCtx.translate(drawX, drawY);
+      pCtx.rotate(tile.currentRotation);
+
+      // Ether red glow during flight or hover distortion
+      const isDistorted = Math.abs(tile.hoverOffsetX) > 2 || Math.abs(tile.hoverOffsetY) > 2;
+      if (easeT < 0.95 || isDistorted) {
+        pCtx.shadowColor = '#ff2b39';
+        pCtx.shadowBlur = isDistorted ? 16 : 12 * (1 - easeT);
+      } else {
+        pCtx.shadowBlur = 0;
+      }
+
+      // Exact slice extraction from original source
+      const srcImgW = imgSource.width || imgSource.naturalWidth || 800;
+      const srcImgH = imgSource.height || imgSource.naturalHeight || 600;
+
+      const srcTileW = srcImgW / COLS;
+      const srcTileH = srcImgH / ROWS;
+      const srcX = tile.c * srcTileW;
+      const srcY = tile.r * srcTileH;
+
+      pCtx.drawImage(
+        imgSource,
+        srcX, srcY, srcTileW, srcTileH,
+        -tile.tileW / 2, -tile.tileH / 2, tile.tileW + 0.5, tile.tileH + 0.5
+      );
+
+      pCtx.restore();
+    });
+
+    // Draw active scatter particles when hovered
+    if (mouse.isHovered) {
+      scatterParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < 0 || p.x > displayW) p.vx *= -1;
+        if (p.y < 0 || p.y > displayH) p.vy *= -1;
+
+        pCtx.fillStyle = `rgba(255, 43, 57, ${p.alpha})`;
+        pCtx.beginPath();
+        pCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        pCtx.fill();
+      });
+    }
+
+    if (progress < 1.4) {
+      progress += 0.014;
+    }
+    
+    animFrameId = requestAnimationFrame(renderFrame);
+  }
+
+  function startAssembleAnimation() {
+    progress = 0;
+    setupCanvasDimensions();
+    initTiles();
+    if (animFrameId) cancelAnimationFrame(animFrameId);
+    renderFrame();
+  }
+
+  // Interactivity handlers
+  pContainer.addEventListener('click', () => {
+    if (sourceLoaded) startAssembleAnimation();
+  });
+
+  pContainer.addEventListener('mousemove', (e) => {
+    const rect = pContainer.getBoundingClientRect();
+    mouse.targetX = (e.clientX - rect.left) / rect.width - 0.5;
+    mouse.targetY = (e.clientY - rect.top) / rect.height - 0.5;
+    mouse.isHovered = true;
+
+    // Apply interactive container 3D transform tilt
+    pCanvas.style.transform = `rotateY(${mouse.targetX * 14}deg) rotateX(${-mouse.targetY * 14}deg)`;
+  });
+
+  pContainer.addEventListener('mouseleave', () => {
+    mouse.targetX = 0;
+    mouse.targetY = 0;
+    mouse.isHovered = false;
+    pCanvas.style.transform = 'rotateY(0deg) rotateX(0deg)';
+  });
+
+  window.addEventListener('resize', () => {
+    if (sourceLoaded) {
+      setupCanvasDimensions();
+      initTiles();
+    }
+  });
+})();
 </script>
 </body>
 </html>
