@@ -36,7 +36,7 @@ a{color:inherit; text-decoration:none;}
 ::selection{background:var(--ether); color:#0a0a0a;}
 
 /* ---- ether background canvas ---- */
-#ether{position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.20;}
+#ether{position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.75;}
 
 /* ---- nav ---- */
 nav{
@@ -109,7 +109,7 @@ nav a:hover{color:var(--ether-soft);}
   background: radial-gradient(circle, rgba(255, 43, 57, 0.35) 0%, rgba(255, 43, 57, 0.1) 45%, rgba(7, 7, 10, 0) 75%);
   border-radius: 12px;
   z-index: 1;
-  animation: glowPulse 3.5s ease-in-out infinite alternate;
+  animation: glowPulse 5s ease-in-out infinite alternate;
   pointer-events: none;
 }
 
@@ -133,11 +133,11 @@ nav a:hover{color:var(--ether-soft);}
   object-fit: contain;
   border-radius: 4px;
   filter: drop-shadow(0 0 20px rgba(255, 43, 57, 0.5));
-  transition: filter 0.3s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: filter 0.3s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .hero-img-container:hover #profileCanvas {
-  filter: drop-shadow(0 0 35px rgba(255, 43, 57, 0.95));
+  filter: drop-shadow(0 0 26px rgba(255, 43, 57, 0.6));
 }
 
 .click-hint {
@@ -156,8 +156,8 @@ nav a:hover{color:var(--ether-soft);}
 }
 
 @keyframes glowPulse {
-  0% { transform: scale(0.92); opacity: 0.4; }
-  100% { transform: scale(1.08); opacity: 0.85; }
+  0% { transform: scale(0.97); opacity: 0.4; }
+  100% { transform: scale(1.03); opacity: 0.65; }
 }
 
 /* ---- sections ---- */
@@ -281,14 +281,23 @@ footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-
   .hero-image-wrapper{order: -1; max-width:550px;}
 }
 @media(max-width:820px){
-  nav ul{display:none;}
+  nav{padding:16px 5vw;}
+  nav ul{gap:20px; overflow-x:auto; max-width:60vw; scrollbar-width:none;}
+  nav ul::-webkit-scrollbar{display:none;}
+  nav a{font-size:.82rem; white-space:nowrap;}
   .about-grid, .project-grid{grid-template-columns:1fr;}
   .cert-grid{grid-template-columns:1fr 1fr;}
   section{padding:80px 6vw;}
+  #profileCanvas{max-height:380px;}
 }
 @media(max-width:480px){
   .cert-grid{grid-template-columns:1fr;}
   .hero-image-wrapper{max-width: 100%;}
+  .hero{padding-top:110px;}
+  #profileCanvas{max-height:300px;}
+  .skill-cloud span{font-size:1rem; padding:11px 18px;}
+  .stat-list{grid-template-columns:1fr 1fr; gap:18px;}
+  .stat b{font-size:1.6rem;}
 }
 @media (prefers-reduced-motion: reduce){
   *{transition:none !important; animation:none !important;}
@@ -500,13 +509,13 @@ let w,h,particles=[];
 function resize(){ w=canvas.width=innerWidth; h=canvas.height=innerHeight; }
 resize(); addEventListener('resize',resize);
 
-const COUNT = Math.min(50, Math.floor((innerWidth*innerHeight)/22000));
+const COUNT = Math.min(70, Math.floor((innerWidth*innerHeight)/18000));
 for(let i=0;i<COUNT;i++){
   particles.push({
     x:Math.random()*w, y:Math.random()*h,
-    r:Math.random()*1.4+0.4,
-    vx:(Math.random()-0.5)*0.2, vy:(Math.random()-0.5)*0.2,
-    a:Math.random()*0.35+0.1
+    r:Math.random()*1.6+0.4,
+    vx:(Math.random()-0.5)*0.25, vy:(Math.random()-0.5)*0.25,
+    a:Math.random()*0.5+0.15
   });
 }
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -517,11 +526,11 @@ function drawBackground(){
   for(const p of particles){
     if(!reduced){ p.x+=p.vx; p.y+=p.vy; }
     if(p.x<0)p.x=w; if(p.x>w)p.x=0; if(p.y<0)p.y=h; if(p.y>h)p.y=0;
-    const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*8);
+    const g = ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r*10);
     g.addColorStop(0, `rgba(255,43,57,${p.a})`);
     g.addColorStop(1, 'rgba(255,43,57,0)');
     ctx.fillStyle=g;
-    ctx.beginPath(); ctx.arc(p.x,p.y,p.r*8,0,Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(p.x,p.y,p.r*10,0,Math.PI*2); ctx.fill();
   }
   requestAnimationFrame(drawBackground);
 }
@@ -827,8 +836,8 @@ saveCertBtn.addEventListener('click', () => {
     pCtx.clearRect(0, 0, displayW, displayH);
 
     // Smooth Interpolation for Mouse Tracking
-    mouse.x += (mouse.targetX - mouse.x) * 0.1;
-    mouse.y += (mouse.targetY - mouse.y) * 0.1;
+    mouse.x += (mouse.targetX - mouse.x) * 0.06;
+    mouse.y += (mouse.targetY - mouse.y) * 0.06;
 
     const mCanvasX = (mouse.x + 0.5) * displayW;
     const mCanvasY = (mouse.y + 0.5) * displayH;
@@ -852,20 +861,20 @@ saveCertBtn.addEventListener('click', () => {
         const dx = tileCenterX - mCanvasX;
         const dy = tileCenterY - mCanvasY;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        const maxDist = 180;
+        const maxDist = 120;
 
         if (dist < maxDist) {
           const factor = Math.pow(1 - dist / maxDist, 2);
-          targetHoverX = (dx / (dist || 1)) * factor * 50;
-          targetHoverY = (dy / (dist || 1)) * factor * 50;
-          targetHoverRot = (dx > 0 ? 1 : -1) * factor * 0.45;
+          targetHoverX = (dx / (dist || 1)) * factor * 18;
+          targetHoverY = (dy / (dist || 1)) * factor * 18;
+          targetHoverRot = (dx > 0 ? 1 : -1) * factor * 0.18;
         }
       }
 
-      // Smooth hover easing
-      tile.hoverOffsetX += (targetHoverX - tile.hoverOffsetX) * 0.12;
-      tile.hoverOffsetY += (targetHoverY - tile.hoverOffsetY) * 0.12;
-      tile.hoverRot += (targetHoverRot - tile.hoverRot) * 0.12;
+      // Smooth hover easing (lower factor = gentler, less jumpy motion)
+      tile.hoverOffsetX += (targetHoverX - tile.hoverOffsetX) * 0.07;
+      tile.hoverOffsetY += (targetHoverY - tile.hoverOffsetY) * 0.07;
+      tile.hoverRot += (targetHoverRot - tile.hoverRot) * 0.07;
 
       tile.currentX = baseCurrentX + tile.hoverOffsetX;
       tile.currentY = baseCurrentY + tile.hoverOffsetY;
@@ -887,7 +896,7 @@ saveCertBtn.addEventListener('click', () => {
       const isDistorted = Math.abs(tile.hoverOffsetX) > 2 || Math.abs(tile.hoverOffsetY) > 2;
       if (easeT < 0.95 || isDistorted) {
         pCtx.shadowColor = '#ff2b39';
-        pCtx.shadowBlur = isDistorted ? 16 : 12 * (1 - easeT);
+        pCtx.shadowBlur = isDistorted ? 9 : 12 * (1 - easeT);
       } else {
         pCtx.shadowBlur = 0;
       }
@@ -945,14 +954,17 @@ saveCertBtn.addEventListener('click', () => {
     if (sourceLoaded) startAssembleAnimation();
   });
 
+  const canHover = matchMedia('(hover: hover) and (pointer: fine)').matches;
+
   pContainer.addEventListener('mousemove', (e) => {
+    if (!canHover) return;
     const rect = pContainer.getBoundingClientRect();
     mouse.targetX = (e.clientX - rect.left) / rect.width - 0.5;
     mouse.targetY = (e.clientY - rect.top) / rect.height - 0.5;
     mouse.isHovered = true;
 
-    // Apply interactive container 3D transform tilt
-    pCanvas.style.transform = `rotateY(${mouse.targetX * 14}deg) rotateX(${-mouse.targetY * 14}deg)`;
+    // Apply interactive container 3D transform tilt (gentle)
+    pCanvas.style.transform = `rotateY(${mouse.targetX * 6}deg) rotateX(${-mouse.targetY * 6}deg)`;
   });
 
   pContainer.addEventListener('mouseleave', () => {
