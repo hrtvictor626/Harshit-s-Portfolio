@@ -308,9 +308,78 @@ footer{padding:30px 6vw calc(30px + var(--safe-b)); color:var(--text-dim); font-
 .reveal.in{opacity:1; transform:translateY(0);}
 .stat b .cursor{color:var(--ether); animation:blink 1s step-end infinite;}
 @keyframes blink{50%{opacity:0;}}
+
+/* ---- boot / terminal intro ---- */
+html.boot-lock, html.boot-lock body{overflow:hidden; height:100%;}
+#bootScreen{
+  position:fixed; inset:0; z-index:9999; background:#040405;
+  display:flex; align-items:center; justify-content:center; padding:6vw;
+  transition:opacity .5s ease, visibility .5s ease;
+  animation:bootFlicker 4s ease-in-out infinite alternate;
+}
+#bootScreen.hide{opacity:0; visibility:hidden; pointer-events:none;}
+@keyframes bootFlicker{0%{opacity:1;}100%{opacity:.97;}}
+
+.boot-terminal{
+  width:min(640px,92vw); background:rgba(11,9,11,.75); backdrop-filter:blur(10px);
+  border:1px solid rgba(255,43,57,.35); border-radius:12px; overflow:hidden;
+  position:relative;
+  box-shadow:0 30px 80px -20px rgba(0,0,0,.6), 0 0 0 1px rgba(255,43,57,.06), 0 0 50px rgba(255,43,57,.15);
+  animation:bootIn .55s cubic-bezier(.2,.8,.2,1) both, termGlow 3.5s ease-in-out infinite alternate .6s;
+}
+@keyframes bootIn{0%{opacity:0; transform:scale(.92) translateY(14px);}100%{opacity:1; transform:scale(1) translateY(0);}}
+@keyframes termGlow{0%{box-shadow:0 30px 80px -20px rgba(0,0,0,.6), 0 0 0 1px rgba(255,43,57,.06), 0 0 40px rgba(255,43,57,.12);}100%{box-shadow:0 30px 80px -20px rgba(0,0,0,.6), 0 0 0 1px rgba(255,43,57,.1), 0 0 65px rgba(255,43,57,.28);}}
+.boot-terminal::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, transparent, var(--ether), var(--ether-soft), var(--ether), transparent);
+  background-size:200% 100%; animation:sheen 2.6s linear infinite;
+}
+@keyframes sheen{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+.boot-bar{
+  display:flex; align-items:center; gap:8px; padding:12px 16px;
+  border-bottom:1px solid rgba(255,43,57,.18); background:rgba(255,255,255,.015);
+}
+.boot-bar span{width:11px; height:11px; border-radius:50%; display:inline-block; position:relative;}
+.boot-bar span::after{content:''; position:absolute; inset:1.5px; border-radius:50%; background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), transparent 60%);}
+.boot-bar span:nth-child(1){background:#ff5f57;}
+.boot-bar span:nth-child(2){background:#febc2e;}
+.boot-bar span:nth-child(3){background:#28c840;}
+.boot-bar b{margin-left:8px; font-family:'Sora',sans-serif; font-size:.74rem; color:var(--text-dim); font-weight:500; letter-spacing:.4px;}
+.boot-body{padding:24px 22px; min-height:230px; position:relative;}
+#bootText{
+  font-family:'Courier New',monospace; font-size:.9rem; line-height:1.75;
+  color:var(--ether-soft); white-space:pre-wrap; word-break:break-word;
+}
+#bootText .ok{color:#3ee06e; font-weight:700;}
+#bootText .grant{color:#ffffff; font-weight:700; text-shadow:0 0 14px rgba(255,43,57,.8); letter-spacing:.5px;}
+.boot-cursor{color:var(--ether); animation:blink .9s step-end infinite;}
+.boot-progress{
+  position:absolute; left:0; right:0; bottom:0; height:2px; background:rgba(255,43,57,.1); overflow:hidden;
+}
+.boot-progress i{
+  display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--ether-deep),var(--ether),var(--ether-soft));
+  transition:width .12s linear; box-shadow:0 0 10px rgba(255,43,57,.6);
+}
+@media(max-width:480px){
+  .boot-body{min-height:180px; padding:20px 16px;}
+  #bootText{font-size:.8rem;}
+}
+@media (prefers-reduced-motion: reduce){
+  #bootScreen{display:none;}
+}
 </style>
 </head>
 <body>
+
+<div id="bootScreen">
+  <div class="boot-terminal">
+    <div class="boot-bar"><span></span><span></span><span></span><b>harshit@portfolio:~</b></div>
+    <div class="boot-body"><pre id="bootText"></pre><span class="boot-cursor" id="bootCursor">█</span>
+      <div class="boot-progress"><i id="bootProgress"></i></div>
+    </div>
+  </div>
+</div>
 
 <canvas id="ether"></canvas>
 
@@ -574,8 +643,63 @@ function typeWrite(el){
   }, 80);
 }
 
-// ---- Hero Entrance ----
-window.addEventListener('load', ()=> document.querySelector('.hero').classList.add('in'));
+// ---- Terminal boot intro ----
+(function bootSequence(){
+  const screen = document.getElementById('bootScreen');
+  const textEl = document.getElementById('bootText');
+  const progress = document.getElementById('bootProgress');
+  const hero = document.querySelector('.hero');
+
+  function finishBoot(){
+    screen.classList.add('hide');
+    document.documentElement.classList.remove('boot-lock');
+    hero.classList.add('in');
+    setTimeout(()=> screen.remove(), 600);
+  }
+
+  if (reduced) { finishBoot(); return; }
+
+  document.documentElement.classList.add('boot-lock');
+
+  const lines = [
+    '> booting portfolio_os v2.7 ...',
+    '> initializing ether_core.dll [OK]',
+    '> loading modules: python · sql · ml · powerbi [OK]',
+    '> compiling projects.exe ...',
+    '> establishing secure connection ... done [OK]',
+    '> ACCESS GRANTED',
+    '> welcome — launching HARSHIT.PORTFOLIO'
+  ];
+
+  function colorize(line){
+    return line
+      .replace(/\[OK\]/g, '<span class="ok">[OK]</span>')
+      .replace(/ACCESS GRANTED/g, '<span class="grant">ACCESS GRANTED</span>');
+  }
+
+  const finalized = [];
+  let li = 0, ci = 0;
+  function typeStep(){
+    if (li >= lines.length){ progress.style.width = '100%'; setTimeout(finishBoot, 450); return; }
+    const line = lines[li];
+    if (ci <= line.length){
+      const done = finalized.length ? finalized.join('\n') + '\n' : '';
+      textEl.innerHTML = done + line.slice(0,ci);
+      const pct = ((li + ci/line.length) / lines.length) * 100;
+      progress.style.width = pct + '%';
+      ci++;
+      setTimeout(typeStep, 16 + Math.random()*18);
+    } else {
+      finalized.push(colorize(line));
+      li++; ci = 0;
+      setTimeout(typeStep, 220);
+    }
+  }
+  setTimeout(typeStep, 350);
+
+  // safety fallback in case something stalls
+  setTimeout(()=>{ if(!screen.classList.contains('hide')) finishBoot(); }, 6500);
+})();
 
 // ---- 3D tilt on project cards ----
 if(!reduced){
