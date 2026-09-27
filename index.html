@@ -612,16 +612,13 @@ document.querySelectorAll('.project-grid, .cert-grid, .stat-list, .skill-cloud, 
 
 const io = new IntersectionObserver((entries)=>{
   entries.forEach(entry=>{
+    const stat = entry.target.matches('.stat') ? entry.target.querySelector('b[data-type]') : null;
     if(entry.isIntersecting){
       entry.target.classList.add('in');
-      
-      setTimeout(() => {
-        entry.target.style.transitionDelay = '0s';
-      }, 800);
-
-      const stat = entry.target.matches('.stat') ? entry.target.querySelector('b[data-type]') : null;
       if(stat) typeWrite(stat);
-      io.unobserve(entry.target);
+    } else {
+      entry.target.classList.remove('in');
+      if(stat) stat.textContent = '';
     }
   });
 }, { threshold:0.18, rootMargin:'0px 0px -60px 0px' });
@@ -1097,6 +1094,23 @@ saveCertBtn.addEventListener('click', () => {
     mouse.isHovered = false;
     pCanvas.style.transform = 'rotateY(0deg) rotateX(0deg)';
   });
+
+  // ---- touch support (phones/tablets: drag a finger over the photo) ----
+  function updateTouchPos(touch){
+    const rect = pContainer.getBoundingClientRect();
+    mouse.targetX = (touch.clientX - rect.left) / rect.width - 0.5;
+    mouse.targetY = (touch.clientY - rect.top) / rect.height - 0.5;
+    mouse.isHovered = true;
+    pCanvas.style.transform = `rotateY(${mouse.targetX * 6}deg) rotateX(${-mouse.targetY * 6}deg)`;
+  }
+  function resetTouch(){
+    mouse.targetX = 0; mouse.targetY = 0; mouse.isHovered = false;
+    pCanvas.style.transform = 'rotateY(0deg) rotateX(0deg)';
+  }
+  pContainer.addEventListener('touchstart', e=>{ if(e.touches[0]) updateTouchPos(e.touches[0]); }, {passive:true});
+  pContainer.addEventListener('touchmove', e=>{ if(e.touches[0]) updateTouchPos(e.touches[0]); }, {passive:true});
+  pContainer.addEventListener('touchend', resetTouch, {passive:true});
+  pContainer.addEventListener('touchcancel', resetTouch, {passive:true});
 
   window.addEventListener('resize', () => {
     if (sourceLoaded) {
